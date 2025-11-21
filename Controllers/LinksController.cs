@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using LinksApi.Data;
-using LinksApi.Models;
 using Microsoft.EntityFrameworkCore;
+using LinksApi.Data;
+using LinksApi.DTOs;
+using LinksApi.Models;
 
 namespace LinksApi.Controllers
 {
@@ -25,65 +26,108 @@ namespace LinksApi.Controllers
 
         //GET: api/links
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Link>>> GetLinks()
+        public async Task<ActionResult<ApiResponse<IEnumerable<LinkResponseDto>>>> GetLinks()
         {
-            return await _context.Links.ToListAsync();
+            var links = await _context.Links
+                .Select(l => new LinkResponseDto
+                {
+                    Id = l.Id,
+                    Name = l.Name,
+                    Url = l.Url,
+                    Category = l.Category,
+                }).ToListAsync();
+
+            return Ok(ApiResponse<IEnumerable<LinkResponseDto>>.Ok(links))
         }
 
         //GET: api/links/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Link>> GetLink(int id)
+        public async Task<ActionResult<ApiResponse<LinkResponseDto>>> GetLink(int id)
         {
             var link = await _context.Links.FindAsync(id);
+
             if (link == null)
             {
-                return NotFound();
+                return NotFound(ApiResponse<LinkResponseDto>.Fail(new[] { "Link não encontrado" }));
             }
 
-            return link;
+            return Ok(ApiResponse<LinkResponseDto>.Ok(new LinkResponseDto
+            {
+                Id = link.Id,
+                Name = link.Name,
+                Url = link.Url,
+                Category = link.Category,
+            }));
         }
 
         //POST: api/links
         [HttpPost]
-        public async Task<ActionResult<Link>> CreateLink(Link link)
+        public async Task<ActionResult<ApiResponse<LinkResponseDto>>> CreateLink([FromBody] LinkCreateDto dto)
         {
-            Console.WriteLine($"POST recebido: {link.Name} - {link.Url}");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ApiResponse<LinkResponseDto>.Fail(
+                        ModelState.Values.SelectMany(v => v.Errors).Select(e.e.ErrorMessage)
+                ));
+            }
+
+            var link = new Link
+            {
+                Name = dto.Name.Trim(),
+                Url = dto.Url.Trim(),
+                Category = dto.Category.Trim()
+            };
+
             _context.Links.Add(link);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetLink), new { id = link.Id }, link);
+
+            return CreatedAtAction(nameof(GetLink), new { id = link.id }, ApiResponse<LinkResponseDto>.Ok(
+                new LinkResponseDto
+                {
+                    Id = link.Id,
+                    Name = link.Name,
+                    Url = link.Url,
+                    Category = link.Category,
+                }
+            ));
+
         }
 
         //PUT: api/links/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateLink(int id, Link link)
+        public async Task<ActionResult<ApiResponse<string>>> UpdateLink(int id, LinkUpdateDto dto)
         {
-            if (id != link.Id)
+            var link = await _context.Links.FindAsync(id);
+            if (link == null)
             {
-                return BadRequest();
+                return NotFound(ApiResponse<string>.Fail(new[] { "Link não encontrado." }));
             }
 
-            _context.Entry(link).State = EntityState.Modified;
+            link.Name = dto.Name.Trim();
+            link.Url = dto.Url.Trim();
+            link.Category = dto.Category.Trim();
+
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(ApiResponse<string>.Ok("Atualizado com sucesso."))
+
         }
 
         //DELETE: api/link/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteLink(int id)
+        public async Task<ActionResult<ApiResponse<string>>> DeleteLink(int id)
         {
-            var link = await _context.Links.FindAsync(id);
+            var link = _context.Links.FindAsync(id);
 
-            if (link == null)
+            if (link = null)
             {
-                return NotFound();
+                return NotFound(ApiResponse<string>.Fail(new[] { "Link não encontrado." }));
             }
 
             _context.Links.Remove(link);
             await _context.SaveChangesAsync();
 
-            return NoContent();
-
+            return Ok(ApiResponse<string>.Ok("Removido com sucesso."))
         }
     }
 }
