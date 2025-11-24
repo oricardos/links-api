@@ -22,7 +22,7 @@ namespace LinksApi.Middlewares
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
 
-                var result = Json.Serialize(new
+                var result = JsonSerializer.Serialize(new
                 {
                     success = false,
                     error = new[] { ex.Message }

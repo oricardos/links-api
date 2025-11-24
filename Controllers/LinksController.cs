@@ -37,7 +37,7 @@ namespace LinksApi.Controllers
                     Category = l.Category,
                 }).ToListAsync();
 
-            return Ok(ApiResponse<IEnumerable<LinkResponseDto>>.Ok(links))
+            return Ok(ApiResponse<IEnumerable<LinkResponseDto>>.Ok(links));
         }
 
         //GET: api/links/5
@@ -67,7 +67,7 @@ namespace LinksApi.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ApiResponse<LinkResponseDto>.Fail(
-                        ModelState.Values.SelectMany(v => v.Errors).Select(e.e.ErrorMessage)
+                        ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
                 ));
             }
 
@@ -81,7 +81,7 @@ namespace LinksApi.Controllers
             _context.Links.Add(link);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetLink), new { id = link.id }, ApiResponse<LinkResponseDto>.Ok(
+            return CreatedAtAction(nameof(GetLink), new { id = link.Id }, ApiResponse<LinkResponseDto>.Ok(
                 new LinkResponseDto
                 {
                     Id = link.Id,
@@ -109,7 +109,7 @@ namespace LinksApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(ApiResponse<string>.Ok("Atualizado com sucesso."))
+            return Ok(ApiResponse<string>.Ok("Atualizado com sucesso."));
 
         }
 
@@ -117,9 +117,9 @@ namespace LinksApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponse<string>>> DeleteLink(int id)
         {
-            var link = _context.Links.FindAsync(id);
+            var link = await _context.Links.FindAsync(id);
 
-            if (link = null)
+            if (link == null)
             {
                 return NotFound(ApiResponse<string>.Fail(new[] { "Link não encontrado." }));
             }
@@ -127,7 +127,7 @@ namespace LinksApi.Controllers
             _context.Links.Remove(link);
             await _context.SaveChangesAsync();
 
-            return Ok(ApiResponse<string>.Ok("Removido com sucesso."))
+            return Ok(ApiResponse<string>.Ok("Removido com sucesso."));
         }
     }
 }

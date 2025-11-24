@@ -2,18 +2,18 @@
 
 namespace LinksApi.DTOs
 {
-    public class LinkUpdateDto
+    public class LinkCreateDto
     {
-        [Required]
+        [Required(ErrorMessage = "O Nome é obrigatório")]
         [MaxLength(120)]
         public string Name { get; set; }
 
-        [Required]
-        [URL]
-        [MaxLength(50)]
+        [Required(ErrorMessage = "A URL é obrigatória.")]
+        [Url(ErrorMessage = "A URL precisa ser válida.")]
+        [MaxLength(2000)]
         public string Url { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "A Categoria é obrigatória")]
         [MaxLength(50)]
         public string Category { get; set; }
     }

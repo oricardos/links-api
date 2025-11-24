@@ -10,6 +10,6 @@ namespace LinksApi.DTOs
 
         public static ApiResponse<T> Ok(T data) => new ApiResponse<T> { Success = true, Data = data };
 
-        public static ApiResponse<T> Fail(IEnumerable<string> errors) => new ApiResponse<T> { Success = false, Errors = erros };
+        public static ApiResponse<T> Fail(IEnumerable<string> errors) => new ApiResponse<T> { Success = false, Errors = errors };
     }
 }
