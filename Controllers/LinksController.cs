@@ -129,5 +129,47 @@ namespace LinksApi.Controllers
 
             return Ok(ApiResponse<string>.Ok("Removido com sucesso."));
         }
+
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPagedLinks(
+            int page = 1,
+            int pageSize = 10
+            )
+        {
+            if (page <= 0 || pageSize <= 0)
+            {
+                return BadRequest(ApiResponse<LinkResponseDto>.Fail(new[] { "Parâmetros inválidos" }));
+            }
+
+            var query = _context.Links.AsQueryable();
+
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await query
+                .OrderBy(l => l.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var response = new PagedResponse<LinkResponseDto>
+            {
+                Message = "Links Paginados",
+                Data = items.Select(l => new LinkResponseDto
+                {
+                    Id = l.Id,
+                    Name = l.Name,
+                    Url = l.Url,
+                    Category = l.Category
+                }),
+
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+            };
+
+            return Ok(response);
+        }
     }
 }
