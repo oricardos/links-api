@@ -133,7 +133,8 @@ namespace LinksApi.Controllers
         [HttpGet("paged")]
         public async Task<IActionResult> GetPagedLinks(
             int page = 1,
-            int pageSize = 10
+            int pageSize = 10,
+            string? category = null
             )
         {
             if (page <= 0 || pageSize <= 0)
@@ -143,11 +144,15 @@ namespace LinksApi.Controllers
 
             var query = _context.Links.AsQueryable();
 
-            int totalItems = await query.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            if (!string.IsNullOrWhiteSpace(category) && category != "Todas")
+            {
+                query = query.Where(l => l.category == category)
+            }
 
-            var items = await query
-                .OrderBy(l => l.Id)
+            var totalItems = await query.CountAsync();
+
+            var links = await query
+                .OrderByDescending(l => l.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -171,5 +176,7 @@ namespace LinksApi.Controllers
 
             return Ok(response);
         }
+
+
     }
 }
