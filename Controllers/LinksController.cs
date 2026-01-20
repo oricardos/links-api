@@ -146,7 +146,7 @@ namespace LinksApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(category) && category != "Todas")
             {
-                query = query.Where(l => l.category == category)
+                query = query.Where(l => l.Category == category);
             }
 
             var totalItems = await query.CountAsync();
@@ -157,21 +157,15 @@ namespace LinksApi.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            var response = new PagedResponse<LinkResponseDto>
+            var response = new PagedResponse<Link>
             {
+                Success = true,
                 Message = "Links Paginados",
-                Data = items.Select(l => new LinkResponseDto
-                {
-                    Id = l.Id,
-                    Name = l.Name,
-                    Url = l.Url,
-                    Category = l.Category
-                }),
-
+                Data = links,
                 Page = page,
                 PageSize = pageSize,
                 TotalItems = totalItems,
-                TotalPages = totalPages,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
             };
 
             return Ok(response);
