@@ -16,10 +16,10 @@ namespace LinksApi.Controllers.Categorias
             _service = service;
         }
 
-        [HttpGet("teste")]
-        public IActionResult teste()
+        [HttpGet("teste-id")]
+        public IActionResult TesteId(int id)
         {
-            return Ok("Endpoint Categorias funcionando!");
+            return Ok(id);
         }
 
         [HttpGet]
@@ -28,6 +28,16 @@ namespace LinksApi.Controllers.Categorias
             var categorias = await _service.GetCategorias();
 
             return Ok(categorias);
+        }
+
+        [HttpGet("buscar/{id}")]
+        public async Task<IActionResult> GetCategoria(int id)
+        {
+            var categoria = await _service.GetCategoria(id);
+
+            if (categoria == null) return NotFound("Categoria não encontrada");
+
+            return Ok(categoria);
         }
 
         [HttpPost]

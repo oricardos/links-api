@@ -6,10 +6,12 @@ namespace LinksApi.Interfaces
     {
         Task<IEnumerable<CategoriaResponseDto>> GetCategorias();
 
+        Task<CategoriaResponseDto> GetCategoria(int id);
+
         Task<CategoriaResponseDto> CriarCategoria(CategoriaRequestDto request);
 
-        Task<CategoriaResponseDto> AtualizarCategoria(int id);
+        //Task<CategoriaResponseDto> AtualizarCategoria(int id);
 
-        Task<CategoriaResponseDto> RemoverCategoria(int id);
+        //Task<CategoriaResponseDto> RemoverCategoria(int id);
     }
 }

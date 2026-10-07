@@ -25,6 +25,18 @@ namespace LinksApi.Services
                 }).ToListAsync();
         }
 
+        public async Task<CategoriaResponseDto> GetCategoria(int id)
+        {
+            return await _context.Categorias
+                .Where(c => c.Id == id)
+                .Select(c => new CategoriaResponseDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Icon = c.Icon
+                }).FirstOrDefaultAsync();
+        }
+
         public async Task<CategoriaResponseDto> CriarCategoria(CategoriaRequestDto request)
         {
             var categoria = new Categoria
