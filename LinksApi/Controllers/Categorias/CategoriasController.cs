@@ -1,4 +1,4 @@
-﻿using LinksApi.DTO;
+using LinksApi.DTO;
 using LinksApi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +30,7 @@ namespace LinksApi.Controllers.Categorias
             return Ok(categorias);
         }
 
-        [HttpGet("buscar/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoria(int id)
         {
             var categoria = await _service.GetCategoria(id);
@@ -51,18 +51,30 @@ namespace LinksApi.Controllers.Categorias
             return Ok(categoria);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> AtualizarCategoria(FromBodyAttribute id, )
-        //{
-        //    var categoria = await _service.AtualizarCategoria(id);
+        [HttpPut("{id}")]
+        public async Task<IActionResult> AtualizarCategoria(int id, CategoriaRequestDto request)
+        {
+            var categoria = await _service.GetCategoria(id);
 
-        //    return Ok(categoria);
-        //}
+            if (categoria == null) 
+                return NotFound("Nenhuma categoria com o id fornecido foi encontrada");
 
-        //[HttpDelete]
-        //public async Task<IActionResult> RemoverCategoria(FromBodyAttribute id)
-        //{
-        //    var categoria = await _service.RemoverCategoria(id);
-        //}
+            var updateCategoria = await _service.AtualizarCategoria(categoria.Id, request);
+
+            return Ok(updateCategoria);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> RemoverCategoria(int id)
+        {
+            var categoria = await _service.GetCategoria(id);
+
+            if (categoria == null)
+                return NotFound("Nenhuma categoria com o id fornecido foi encontrada");
+
+            var removeCategoria = await _service.RemoverCategoria(id);
+
+            return Ok(removeCategoria);
+        }
     }
 }
