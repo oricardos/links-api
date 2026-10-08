@@ -1,4 +1,4 @@
-﻿using LinksApi.DTO;
+using LinksApi.DTO;
 
 namespace LinksApi.Interfaces
 {
@@ -10,8 +10,8 @@ namespace LinksApi.Interfaces
 
         Task<CategoriaResponseDto> CriarCategoria(CategoriaRequestDto request);
 
-        //Task<CategoriaResponseDto> AtualizarCategoria(int id);
+        Task<CategoriaResponseDto> AtualizarCategoria(int id, CategoriaRequestDto request);
 
-        //Task<CategoriaResponseDto> RemoverCategoria(int id);
+        Task<CategoriaResponseDto?> RemoverCategoria(int id);
     }
 }
