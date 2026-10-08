@@ -1,4 +1,4 @@
-﻿using LinksApi.Data;
+using LinksApi.Data;
 using LinksApi.DTO;
 using LinksApi.Interfaces;
 using LinksApi.Models;
@@ -57,19 +57,43 @@ namespace LinksApi.Services
             };
         }
 
-        //public Task<CategoriaResponseDto> AtualizarCategoria(int id)
-        //{
+        public async Task<CategoriaResponseDto> AtualizarCategoria(int id, CategoriaRequestDto request)
+        {
+            var categoria = await _context.Categorias
+                .Where(c => c.Id == id)
+                .FirstOrDefaultAsync();
 
-        //}
+            categoria.Name = request.Name;
+            categoria.Icon = request.Icon;
 
-        //public Task<CategoriaResponseDto> RemoverCategoria(int id)
-        //{
-        //    var categoria = _context.Categorias
-        //        .Where(c =>
-        //        {
-        //            c.Id = id
-        //        })
-        //        .Remove();
-        //}
+            await _context.SaveChangesAsync();
+
+            return new CategoriaResponseDto
+            {
+                Id = id,
+                Name = categoria.Name,
+                Icon = categoria.Icon
+            };
+        }
+
+        public async Task<CategoriaResponseDto?> RemoverCategoria(int id)
+        {
+            var categoria = await _context.Categorias.FindAsync(id);
+
+            if (categoria == null)
+            {
+                return null;
+            }
+
+            _context.Categorias.Remove(categoria);
+            await _context.SaveChangesAsync();
+
+            return new CategoriaResponseDto 
+            {
+                Id = categoria.Id, 
+                Name = categoria.Name, 
+                Icon = categoria.Icon
+            };
+        }
     }
 }
