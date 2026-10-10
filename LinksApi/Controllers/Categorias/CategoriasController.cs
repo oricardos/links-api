@@ -16,12 +16,6 @@ namespace LinksApi.Controllers.Categorias
             _service = service;
         }
 
-        [HttpGet("teste-id")]
-        public IActionResult TesteId(int id)
-        {
-            return Ok(id);
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetCategorias()
         {
