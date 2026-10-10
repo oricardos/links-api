@@ -1,6 +1,6 @@
 ﻿namespace LinksApi.DTO.Usuarios
 {
-    public class CriarUsuarioDTO
+    public class UsuarioRequestDto
     {
         public string Nome { get; set; } = string.Empty;
 
