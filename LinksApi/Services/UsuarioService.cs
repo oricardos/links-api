@@ -30,7 +30,7 @@ namespace LinksApi.Services
                 }).ToListAsync();
         }
 
-        public async Task<UsuarioResponseDto> GetUsuario(int id)
+        public async Task<UsuarioResponseDto?> GetUsuario(int id)
         {
             return await _context.Usuarios
                 .Where(u => u.Id == id)
