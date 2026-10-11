@@ -42,7 +42,8 @@ namespace LinksApi.Services
             var categoria = new Categoria
             {
                 Name = request.Name,
-                Icon = request.Icon
+                Icon = request.Icon,
+                UsuarioId = request.UsuarioId
             };
 
             _context.Add(categoria);
