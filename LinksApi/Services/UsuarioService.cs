@@ -108,5 +108,26 @@ namespace LinksApi.Services
                 Ativo = usuario.Ativo
             };
         }
+
+        public async Task<Usuario?> GetUsuarioPorEmail(string email)
+        {
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<Usuario?> ValidarLogin(string email, string senha)
+        {
+            var usuario = await GetUsuarioPorEmail(email);
+
+            if (usuario == null || !usuario.Ativo)
+                return null;
+
+            var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.SenhaHash, senha);
+
+            if (resultado == PasswordVerificationResult.Failed)
+                return null;
+
+            return usuario;
+        }
     }
 }
