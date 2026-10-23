@@ -14,9 +14,10 @@ namespace LinksApi.Services
         {
             _context = context;
         }
-        public async Task<IEnumerable<CategoriaResponseDto>> GetCategorias()
+        public async Task<IEnumerable<CategoriaResponseDto>> GetCategorias(int usuarioId)
         {
             return await _context.Categorias
+                .Where(c => c.UsuarioId == usuarioId)
                 .Select(c => new CategoriaResponseDto
                 {
                     Id = c.Id,
@@ -25,10 +26,10 @@ namespace LinksApi.Services
                 }).ToListAsync();
         }
 
-        public async Task<CategoriaResponseDto> GetCategoria(int id)
+        public async Task<CategoriaResponseDto?> GetCategoria(int id, int usuarioId)
         {
             return await _context.Categorias
-                .Where(c => c.Id == id)
+                .Where(c => c.Id == id && c.UsuarioId == usuarioId)
                 .Select(c => new CategoriaResponseDto
                 {
                     Id = c.Id,
@@ -37,13 +38,13 @@ namespace LinksApi.Services
                 }).FirstOrDefaultAsync();
         }
 
-        public async Task<CategoriaResponseDto> CriarCategoria(CategoriaRequestDto request)
+        public async Task<CategoriaResponseDto> CriarCategoria(CategoriaRequestDto request, int usuarioId)
         {
             var categoria = new Categoria
             {
                 Name = request.Name,
                 Icon = request.Icon,
-                UsuarioId = request.UsuarioId
+                UsuarioId = usuarioId
             };
 
             _context.Add(categoria);
@@ -58,10 +59,10 @@ namespace LinksApi.Services
             };
         }
 
-        public async Task<CategoriaResponseDto> AtualizarCategoria(int id, CategoriaRequestDto request)
+        public async Task<CategoriaResponseDto> AtualizarCategoria(int id, CategoriaRequestDto request, int usuarioId)
         {
             var categoria = await _context.Categorias
-                .Where(c => c.Id == id)
+                .Where(c => c.Id == id && c.UsuarioId == usuarioId)
                 .FirstOrDefaultAsync();
 
             categoria.Name = request.Name;
@@ -77,9 +78,11 @@ namespace LinksApi.Services
             };
         }
 
-        public async Task<CategoriaResponseDto?> RemoverCategoria(int id)
+        public async Task<CategoriaResponseDto?> RemoverCategoria(int id, int usuarioId)
         {
-            var categoria = await _context.Categorias.FindAsync(id);
+            var categoria = await _context.Categorias
+                .Where(c => c.Id == id && c.UsuarioId == usuarioId)
+                .FirstOrDefaultAsync();
 
             if (categoria == null)
             {
