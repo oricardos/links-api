@@ -6,7 +6,7 @@ namespace LinksApi.Interfaces
     {
         Task<IEnumerable<CategoriaResponseDto>> GetCategorias(int usuarioId);
 
-        Task<CategoriaResponseDto> GetCategoria(int id, int usuarioId);
+        Task<CategoriaResponseDto?> GetCategoria(int id, int usuarioId);
 
         Task<CategoriaResponseDto> CriarCategoria(CategoriaRequestDto request, int usuarioId);
 

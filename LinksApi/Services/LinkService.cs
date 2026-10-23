@@ -15,9 +15,10 @@ namespace LinksApi.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<LinkResponseDto>> GetLinks()
+        public async Task<IEnumerable<LinkResponseDto>> GetLinks(int usuarioId)
         {
             return await _context.Links
+                .Where(l => l.UsuarioId == usuarioId)
                 .Select(l => new LinkResponseDto
                 {
                     Id = l.Id,
@@ -28,10 +29,10 @@ namespace LinksApi.Services
                 }).ToListAsync();
         }
 
-        public async Task<LinkResponseDto?> GetLink(int id)
+        public async Task<LinkResponseDto?> GetLink(int id, int usuarioId)
         {
-            return await _context.Links
-                .Where(l => l.Id == id)
+            var link = await _context.Links
+                .Where(l => l.Id == id && l.UsuarioId == usuarioId)
                 .Select(l => new LinkResponseDto
                 {
                     Id = l.Id,
@@ -40,16 +41,27 @@ namespace LinksApi.Services
                     CategoriaId = l.CategoriaId,
                     UsuarioId = l.UsuarioId
                 }).FirstOrDefaultAsync();
+
+            if (link == null)
+                return null;
+
+            return link;
         }
 
-        public async Task<LinkResponseDto> CriarLink(LinkRequestDto request)
+        public async Task<LinkResponseDto?> CriarLink(LinkRequestDto request, int usuarioId)
         {
+            var categoriaExiste = await _context.Categorias
+                .AnyAsync(c => c.Id == request.CategoriaId && c.UsuarioId == usuarioId);
+
+            if (!categoriaExiste)
+                return null;
+
             var link = new Link
             {
                 Nome = request.Nome,
                 Url = request.Url,
                 CategoriaId = request.CategoriaId,
-                UsuarioId = request.UsuarioId
+                UsuarioId = usuarioId
             };
 
             _context.Add(link);
@@ -66,16 +78,25 @@ namespace LinksApi.Services
             };
         }
 
-        public async Task<LinkResponseDto> AtualizarLink(int id, LinkRequestDto request)
+        public async Task<LinkResponseDto?> AtualizarLink(int id, LinkRequestDto request, int usuarioId)
         {
+            var categoriaExiste = await _context.Categorias
+                .AnyAsync(c => c.Id == request.CategoriaId && c.UsuarioId == usuarioId);
+
+            if (!categoriaExiste)
+                return null;
+
             var link = await _context.Links
-                .Where(l => l.Id == id)
+                .Where(l => l.Id == id && l.UsuarioId == usuarioId)
                 .FirstOrDefaultAsync();
+
+            if (link == null)
+                return null;
 
             link.Nome = request.Nome;
             link.Url = request.Url;
             link.CategoriaId = request.CategoriaId;
-            link.UsuarioId = request.UsuarioId;
+            link.UsuarioId = usuarioId;
 
             await _context.SaveChangesAsync();
 
@@ -89,9 +110,11 @@ namespace LinksApi.Services
             };
         }
 
-        public async Task<LinkResponseDto?> RemoverLink(int id)
+        public async Task<LinkResponseDto?> RemoverLink(int id, int usuarioId)
         {
-            var link = await _context.Links.FindAsync(id);
+            var link = await _context.Links
+                .Where(l => l.Id == id && l.UsuarioId == usuarioId)
+                .FirstOrDefaultAsync();
 
             if (link == null)
                 return null;
