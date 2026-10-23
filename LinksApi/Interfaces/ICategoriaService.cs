@@ -8,10 +8,10 @@ namespace LinksApi.Interfaces
 
         Task<CategoriaResponseDto> GetCategoria(int id, int usuarioId);
 
-        Task<CategoriaResponseDto> CriarCategoria(CategoriaRequestDto request);
+        Task<CategoriaResponseDto> CriarCategoria(CategoriaRequestDto request, int usuarioId);
 
-        Task<CategoriaResponseDto> AtualizarCategoria(int id, CategoriaRequestDto request);
+        Task<CategoriaResponseDto> AtualizarCategoria(int id, CategoriaRequestDto request, int usuarioId);
 
-        Task<CategoriaResponseDto?> RemoverCategoria(int id);
+        Task<CategoriaResponseDto?> RemoverCategoria(int id, int usuarioId);
     }
 }

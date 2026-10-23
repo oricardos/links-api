@@ -57,7 +57,14 @@ namespace LinksApi.Controllers.Categorias
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var categoria = await _service.CriarCategoria(request);
+            var usuarioIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (usuarioIdClaim == null)
+                return Unauthorized();
+
+            var usuarioId = int.Parse(usuarioIdClaim);
+
+            var categoria = await _service.CriarCategoria(request, usuarioId);
 
             return Ok(categoria);
         }
@@ -77,7 +84,7 @@ namespace LinksApi.Controllers.Categorias
             if (categoria == null) 
                 return NotFound("Nenhuma categoria com o id fornecido foi encontrada");
 
-            var updateCategoria = await _service.AtualizarCategoria(categoria.Id, request);
+            var updateCategoria = await _service.AtualizarCategoria(categoria.Id, request, usuarioId);
 
             return Ok(updateCategoria);
         }
@@ -97,7 +104,7 @@ namespace LinksApi.Controllers.Categorias
             if (categoria == null)
                 return NotFound("Nenhuma categoria com o id fornecido foi encontrada");
 
-            var removeCategoria = await _service.RemoverCategoria(id);
+            var removeCategoria = await _service.RemoverCategoria(id, usuarioId);
 
             return Ok(removeCategoria);
         }
