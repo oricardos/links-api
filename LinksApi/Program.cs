@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,29 @@ builder.Services
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtKey))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var usuarioIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (!int.TryParse(usuarioIdClaim, out var usuarioId))
+                {
+                    context.Fail("Usuário inválido.");
+                    return;
+                }
+
+                var usuarioServices = context.HttpContext.RequestServices.GetRequiredService<IUsuarioService>();
+
+                var usuario = await usuarioServices.GetUsuario(usuarioId);
+
+                if (usuario == null || !usuario.Ativo)
+                {
+                    context.Fail("Usuário inexistente ou inativo.");
+                }
+            }
         };
     });
 
